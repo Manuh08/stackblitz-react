@@ -7,12 +7,27 @@ export default function App() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
+
+  const navigate = useNavigate();
+
   const autenticarComFirebase = async (evento) => {
     evento.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, senha);
+
+      const secretKey = new TextEncoder().encode('minhaChaveSecreta');
+
+      const token = await new SignJWT({ user: 'admin' })
+      .setProtectHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpiration('1h')
+      .sign(secretKey);
+
+      localStorage.setItem('token', token);
+      navigate('/');
       alert('Logado com sucesso!');
-    } catch (err) {
+    } 
+    catch (err) {
       alert('Erro no processo ', err);
     }
   };
